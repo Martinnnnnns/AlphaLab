@@ -10,7 +10,7 @@ Most backtesting tools either oversimplify execution (ignoring slippage, commiss
 
 - **Market Data Pipeline** — Fetch, validate, and cache stock data from Yahoo Finance with automatic retry and quality scoring
 - **50+ Technical Indicators** — SMA, EMA, MACD, RSI, Bollinger Bands, ATR, OBV, Fibonacci levels, and more
-- **3 Built-in Strategies** — Moving Average Crossover, RSI Mean Reversion, Momentum Breakout
+- **5 Built-in Strategies** — Moving Average Crossover, RSI Mean Reversion, Momentum Breakout, Bollinger Breakout, VWAP Reversion
 - **Realistic Backtesting** — Next-bar execution (no look-ahead bias), configurable slippage and commissions, position limits
 - **30+ Performance Metrics** — Sharpe, Sortino, Calmar, max drawdown, VaR, win rate, profit factor, benchmark comparison
 - **Monte Carlo Simulation** — Randomized entry timing to assess outcome distributions
@@ -140,6 +140,8 @@ curl -X POST http://127.0.0.1:5000/api/strategies/backtest \
 | `ma_crossover` | Buy/sell on moving average crossovers (Golden/Death Cross) | `short_window`, `long_window`, `cooldown_days` |
 | `rsi_mean_reversion` | Buy oversold, sell overbought with BB/ADX confirmation | `oversold`, `overbought`, `adx_threshold` |
 | `momentum_breakout` | Enter on price breakout with volume surge | `lookback`, `volume_surge_pct`, `stop_loss_atr_mult` |
+| `bollinger_breakout` | Volatility breakout on Bollinger Band breaks | `bb_period`, `bb_std_dev`, `confirmation_bars`, `volume_filter` |
+| `vwap_reversion` | Mean reversion from VWAP with RSI filter | `vwap_period`, `deviation_threshold`, `oversold`, `overbought` |
 
 See [docs/STRATEGIES.md](docs/STRATEGIES.md) for detailed strategy documentation.
 
@@ -150,7 +152,7 @@ AlphaLab/
 ├── backend/                    # Flask REST API (Python)
 │   ├── src/
 │   │   ├── data/              # Fetching, validation, feature engineering
-│   │   ├── strategies/        # BaseStrategy + 3 implementations
+│   │   ├── strategies/        # BaseStrategy + 5 implementations
 │   │   ├── backtest/          # Engine, portfolio, metrics, orders
 │   │   ├── api/               # Flask routes + Pydantic validators
 │   │   └── utils/             # Logger, config, exceptions
@@ -210,8 +212,11 @@ All settings are in `backend/config.yaml` — initial capital, slippage, commiss
 - [x] Dashboard with backtest history and quick stats
 - [x] Strategy comparison page (side-by-side analysis)
 - [x] Tauri desktop packaging (.dmg for macOS, .msi for Windows, .deb for Linux)
-- [ ] Additional strategies (Pairs Trading, Bollinger Band Breakout)
-- [ ] Multi-asset portfolio optimization
+- [x] Bollinger Band Breakout and VWAP Reversion strategies
+- [x] Portfolio optimization (Max Sharpe, Min Variance, Risk Parity, Equal Weight)
+- [x] Batch backtesting (test one strategy across multiple tickers)
+- [x] Strategy export to JSON (AlphaLive integration)
+- [ ] Additional strategies (Pairs Trading, Statistical Arbitrage)
 - [ ] PDF report export
 - [ ] Real-time data via WebSocket
 - [ ] Machine learning strategy framework
@@ -380,9 +385,9 @@ Before submitting, ensure:
 
 #### Backend
 - ✅ Flask REST API (127.0.0.1:5000)
-- ✅ 81 passing tests
-- ✅ 7 API endpoints with Pydantic validation
-- ✅ 3 trading strategies (MA Crossover, RSI Mean Reversion, Momentum Breakout)
+- ✅ 120+ passing tests
+- ✅ 9 API endpoints with Pydantic validation
+- ✅ 5 trading strategies (MA Crossover, RSI Mean Reversion, Momentum Breakout, Bollinger Breakout, VWAP Reversion)
 - ✅ 50+ technical indicators
 - ✅ 30+ performance metrics
 - ✅ Data caching with parquet
@@ -390,9 +395,9 @@ Before submitting, ensure:
 
 #### Frontend
 - ✅ React + TypeScript + Vite
-- ✅ 4 pages: Dashboard, Backtest, Compare, DataManager
+- ✅ 6 pages: Dashboard, Backtest (Single + Batch), Compare, DataManager, Portfolio, Settings
 - ✅ shadcn/ui components
-- ✅ Recharts visualizations
+- ✅ Recharts visualizations (equity curves, drawdowns, monthly returns heatmap)
 - ✅ Zustand state management
 - ✅ React Query for API calls
 - ✅ Tailwind CSS styling
@@ -409,9 +414,9 @@ Before submitting, ensure:
 
 - **Backend Code:** Python, Flask
 - **Frontend Code:** TypeScript, React
-- **Total Tests:** 81 (all passing)
-- **API Endpoints:** 7
-- **Strategies:** 3
+- **Total Tests:** 120+ (all passing)
+- **API Endpoints:** 9
+- **Strategies:** 5
 - **Indicators:** 50+
 - **Metrics:** 30+
 - **Desktop Installer:** 5.5MB
